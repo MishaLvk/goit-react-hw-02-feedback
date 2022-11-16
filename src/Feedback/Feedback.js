@@ -1,72 +1,55 @@
 import React from 'react';
+import Statistics from './Statistics';
+import FeedbackOptions from './FeedbackOptions';
+import Notification from './Notification';
+import './Feedback.css';
 
 class Feedback extends React.Component {
   state = {
-    goodValue: 0,
-    neutralValue: 0,
-    badValue: 0,
+    good: 0,
+    neutral: 0,
+    bad: 0,
   };
 
-  GoodIncrement = () => {
+  clickIncrement = lable => {
+    const { btn } = lable;
     this.setState(prevState => {
       return {
-        goodValue: prevState.goodValue + 1,
+        [btn]: prevState[btn] + 1,
       };
     });
   };
 
-  NeutralIncrement = () => {
-    this.setState(prevState => {
-      return {
-        neutralValue: prevState.neutralValue + 1,
-      };
-    });
+  CountTotalFeedback = () => {
+    return this.state.good + this.state.neutral + this.state.bad;
   };
 
-  BadIncrement = () => {
-    this.setState(prevState => {
-      return {
-        badValue: prevState.badValue + 1,
-      };
-    });
-  };
-
-  SummIncrement = () => {
-    return this.state.goodValue + this.state.neutralValue + this.state.badValue;
-  };
-
-  PositiveFeedback = () => {
-    return parseInt((this.state.goodValue / this.SummIncrement()) * 100);
+  CountPositiveFeedbackPercentage = () => {
+    return parseInt((this.state.good / this.CountTotalFeedback()) * 100);
   };
 
   render() {
     return (
-      <div className="Feedback">
+      <section title="Feedback" className="Feedback_container">
         <h1>Please leave feedback</h1>
-        <div className="Feedback_controls">
-          <button type="button" onClick={this.GoodIncrement}>
-            Good
-          </button>
-          <button type="button" onClick={this.NeutralIncrement}>
-            Neutral
-          </button>
-          <button type="button" onClick={this.BadIncrement}>
-            Bad
-          </button>
-        </div>
-        <div className="Feedback_statistics">
-          <h2>Statistics</h2>
-          <span className="Statistic_value">Good: {this.state.goodValue}</span>
-          <span className="Statistic_value">
-            Neutral: {this.state.neutralValue}
-          </span>
-          <span className="Statistic_value">Bad: {this.state.badValue}</span>
-          <span className="Statistic_value">Total: {this.SummIncrement()}</span>
-          <span className="Statistic_value">
-            Positive feedback: {this.PositiveFeedback()}%
-          </span>
-        </div>
-      </div>
+
+        <FeedbackOptions
+          options={['good', 'neutral', 'bad']}
+          onLeaveFeedback={this.clickIncrement}
+        ></FeedbackOptions>
+        <h2>Statistics</h2>
+        {this.CountTotalFeedback() ? (
+          <Statistics
+            good={this.state.good}
+            neutral={this.state.neutral}
+            bad={this.state.bad}
+            total={this.CountTotalFeedback()}
+            positivePercentage={this.CountPositiveFeedbackPercentage()}
+          ></Statistics>
+        ) : (
+          <Notification message="There is no feedback" />
+        )}
+      </section>
     );
   }
 }
